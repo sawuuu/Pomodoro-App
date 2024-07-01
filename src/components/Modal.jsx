@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Button } from "./Button";
 
-export function Modal({ onClose, setTime }) {
+export function Modal({ onClose, setTime, notify }) {
   const [customTime, setCustomTime] = useState();
 
   function customTimeToMilliseconds(time) {
@@ -9,8 +9,14 @@ export function Modal({ onClose, setTime }) {
   }
 
   function handleSaveButtonClick() {
-    if (customTime !== undefined) {
+    console.log(customTime);
+    if (customTime !== undefined && customTime > 0) {
+      notify("Saved custom time!", true);
       setTime(customTimeToMilliseconds(customTime));
+      onClose();
+    } else {
+      notify("Custom time must be greater than 0!", false);
+      onClose();
     }
   }
 
@@ -21,16 +27,13 @@ export function Modal({ onClose, setTime }) {
       </button>
       <p className="text-xl">Enter minutes</p>
       <input
+        min="1"
+        max="1439"
         type="number"
-        className="w-24"
+        className="w-24 p-2 rounded-sm"
         onChange={(e) => setCustomTime(e.currentTarget.value)}
       />
-      <Button
-        text="Save"
-        onClick={() => {
-          handleSaveButtonClick();
-        }}
-      />
+      <Button text="Save" onClick={handleSaveButtonClick} />
     </div>
   );
 }

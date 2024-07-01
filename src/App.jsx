@@ -3,6 +3,7 @@ import { Button } from "./components/Button";
 import { Timer } from "./components/Timer";
 import { createPortal } from "react-dom";
 import { Modal } from "./components/Modal";
+import toast, { Toaster } from "react-hot-toast";
 
 function App() {
   const getStartValue = () => localStorage.getItem("time") || 900000;
@@ -11,8 +12,20 @@ function App() {
   const [isStarted, setIsStarted] = useState(false);
   const [isModalShown, setIsModalShown] = useState(false);
 
+  function notify(text, success) {
+    if (success) {
+      toast.success(text);
+    } else {
+      toast.error(text);
+    }
+  }
+
   const modal = createPortal(
-    <Modal onClose={() => setIsModalShown(false)} setTime={setTime} />,
+    <Modal
+      onClose={() => setIsModalShown(false)}
+      setTime={setTime}
+      notify={notify}
+    />,
     document.body
   );
 
@@ -44,24 +57,26 @@ function App() {
     return () => clearInterval(timeInterval);
   }, [isStarted, time]);
 
-  return isModalShown ? (
-    modal
-  ) : (
-    <div className="min-w-[1440px] mt-16 p-8 flex flex-col items-center">
+  return (
+    <>
+      {isModalShown && modal}
       <div className="min-w-[1440px] mt-16 p-8 flex flex-col items-center">
-        <h1 className="text-5xl text-center mb-7">Pomodoro</h1>
-        <div className="flex gap-3 mb-8">
-          <Button text="Short time" onClick={() => setTime(900000)} />
-          <Button text="Long time" onClick={() => setTime(2700000)} />
-          <Button text="custom" onClick={() => setIsModalShown(true)} />
-        </div>
-        <Timer time={time} />
-        <div className="flex gap-3 mt-8">
-          <Button text="Start" onClick={() => setIsStarted(true)} />
-          <Button text="Stop" onClick={() => setIsStarted(false)} />
+        <Toaster />
+        <div className="min-w-[1440px] mt-16 p-8 flex flex-col items-center">
+          <h1 className="text-5xl text-center mb-7">Pomodoro</h1>
+          <div className="flex gap-3 mb-8">
+            <Button text="Short time" onClick={() => setTime(900000)} />
+            <Button text="Long time" onClick={() => setTime(2700000)} />
+            <Button text="custom" onClick={() => setIsModalShown(true)} />
+          </div>
+          <Timer time={time} />
+          <div className="flex gap-3 mt-8">
+            <Button text="Start" onClick={() => setIsStarted(true)} />
+            <Button text="Stop" onClick={() => setIsStarted(false)} />
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }
 
